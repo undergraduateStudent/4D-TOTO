@@ -1,0 +1,120 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ea76a4;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 520px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 28px;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+input[type="file"] {
+  font-size: 18px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+button {
+  font-size: 18px;
+  padding: 12px;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.hint {
+  font-size: 14px;
+  color: #555;
+  margin-top: 8px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+}
+
+.result-row {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+pre {
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.final-message {
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.success {
+  color: #2e7d32;
+}
+
+.fail {
+  color: #c62828;
+}
+
+/* Language switcher */
+.language-switcher {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+}
+
+.language-switcher select {
+  font-size: 16px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.winning-box {
+  background: #f5f7fa;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.winning-line {
+  margin-bottom: 6px;
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lottery Ticket Checker</title>
+
+  <!-- Apply CSS -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Mobile friendly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+  <!-- Language Selector (Top Right) -->
+  <div class="language-switcher">
+    <select id="languageSelect" onchange="changeLanguage()">
+      <option value="en">English</option>
+      <option value="zh">简体中文</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="ta">தமிழ்</option>
+    </select>
+  </div>
+
+  <!-- Page wrapper -->
+  <div class="page">
+
+    <!-- Main container -->
+    <div class="container">
+
+      <h1 data-i18n="title">Lottery Ticket Checker</h1>
+
+      <p class="subtitle" data-i18n="subtitle">
+        Upload a photo of your TOTO or 4D ticket
+      </p>
+
+      <!-- Upload Section -->
+      <div class="card">
+        <h2 data-i18n="step1">Step 1: Upload Ticket</h2>
+
+        <input type="file" id="fileInput" accept="image/*">
+
+        <button class="primary-btn" onclick="uploadTicket()" data-i18n="check_ticket">
+          Check Ticket
+        </button>
+
+        <p class="hint" data-i18n="hint">
+          Take a clear photo in good lighting. Make sure all numbers are visible.
+        </p>
+      </div>
+
+      <!-- Loading -->
+      <div class="card loading" id="loading" style="display:none;" data-i18n="loading">
+        Checking your ticket, please wait...
+      </div>
+
+      <!-- Result Section -->
+      <div class="card" id="resultCard" style="display:none;">
+        <h2 data-i18n="result">Result</h2>
+
+        <div class="result-row">
+          <strong data-i18n="game">Game:</strong>
+          <span id="gameType"></span>
+        </div>
+
+        <div class="result-row">
+          <strong data-i18n="your_numbers">Your Numbers:</strong>
+          <span id="ticketNumbers"></span>
+        </div>
+
+        <div class="result-row">
+          <strong data-i18n="winning_numbers">Winning Numbers:</strong>
+          <div id="winningNumbers" class="winning-box"></div>
+        </div>
+
+        <div id="finalMessage" class="final-message"></div>
+
+        <button class="secondary-btn" onclick="reset()" data-i18n="check_another">
+          Check Another Ticket
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+
+</body>
+</html>
