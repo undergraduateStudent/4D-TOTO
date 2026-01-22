@@ -1,30 +1,12 @@
-"""
-database.py
-
-SQLite database utilities for storing ticket checks.
-
-This module handles:
-- database initialization
-- saving checked tickets
-- retrieving ticket history
-
-Data is stored in tickets.db using a single table "tickets".
-"""
-
 import sqlite3
 import json
 from datetime import datetime
+
 
 DB_NAME = "tickets.db"
 
 
 def get_connection():
-    """
-    Create and return a SQLite connection.
-
-    Returns:
-        sqlite3.Connection: Database connection object.
-    """
     return sqlite3.connect(
         DB_NAME,
         timeout=5,
@@ -33,20 +15,11 @@ def get_connection():
 
 
 def init_db():
-    """
-    Initialize the SQLite database if it does not exist.
-
-    Creates table `tickets` with fields for:
-    - ticket information
-    - prize checking result
-    - winner status
-    - created timestamp
-    """
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("PRAGMA journal_mode=WAL;")
-
+    
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,14 +38,6 @@ def init_db():
 
 
 def save_ticket(ticket, prize_results, is_winner):
-    """
-    Save a checked ticket record into the database.
-
-    Args:
-        ticket (Ticket): Ticket object containing extracted ticket details.
-        prize_results (dict): Prize checking output results.
-        is_winner (bool): Whether ticket won any prize.
-    """
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -101,12 +66,6 @@ def save_ticket(ticket, prize_results, is_winner):
 
 
 def get_all_tickets():
-    """
-    Retrieve all saved ticket records from the database.
-
-    Returns:
-        list[dict]: List of tickets ordered by created_at descending.
-    """
     conn = get_connection()
     cursor = conn.cursor()
 

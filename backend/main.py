@@ -1,19 +1,6 @@
-"""
-main.py
-
-FastAPI backend for the Lottery Ticket Checker application.
-
-This API supports:
-- Uploading a ticket image for OCR processing and prize checking
-- Retrieving saved ticket-check history from SQLite
-
-Main endpoint:
-- POST /upload-image-ticket
-- GET  /history
-"""
-
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import os
 
 from backend.models.ticket import Ticket
@@ -41,75 +28,38 @@ app = FastAPI(title="Lottery Ticket Application")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow frontend to call backend locally
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize database at startup
 init_db()
 
-# Directory for saving uploaded images
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
+# -------------------------------------------------
+# Helper: unified winning number fetch
+# -------------------------------------------------
 def get_winning_numbers(game_type: str, draw_date: str):
-    """
-    Fetch winning numbers for a specific game and draw date.
-
-    Args:
-        game_type (str): Either "TOTO" or "4D".
-        draw_date (str): ISO date string (YYYY-MM-DD) or "UNKNOWN".
-
-    Returns:
-        list[int] | dict | None:
-            - For TOTO: list of 6 winning numbers
-            - For 4D: dictionary of prize categories
-            - None: if winning numbers are not available
-    """
     if game_type == "TOTO":
         return get_toto_winning_numbers(draw_date)
     elif game_type == "4D":
         return get_fourd_winning_numbers(draw_date)
     return None
 
-
+# -------------------------------------------------
+# OCR ticket upload endpoint
+# -------------------------------------------------
 @app.post("/upload-image-ticket")
 def upload_image_ticket(file: UploadFile = File(...)):
-    """
-    Upload a lottery ticket image and perform OCR + prize checking.
 
-    Workflow:
-    1) Validate file is an image
-    2) Save file into uploads/
-    3) Run OCR to extract text + numbers
-    4) Classify game type (TOTO / 4D)
-    5) Extract draw date from text
-    6) Validate numbers based on game type
-    7) Compare against winning numbers
-    8) Save ticket and results into SQLite database
-    9) Return result JSON
-
-    Args:
-        file (UploadFile): Uploaded ticket image file.
-
-    Returns:
-        dict: Ticket info, winning numbers, winner status, and prize results.
-
-    Raises:
-        HTTPException:
-            - 400 if file is not an image or ticket format is invalid
-            - 404 if winning numbers are not available
-            - 500 for unexpected errors (OCR/database failures)
-    """
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be an image")
 
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 
-    # Save uploaded image locally
     try:
         with open(file_path, "wb") as buffer:
             buffer.write(file.file.read())
@@ -124,10 +74,10 @@ def upload_image_ticket(file: UploadFile = File(...)):
         game_type = classify_game_type(raw_text, extracted_numbers)
         draw_date = extract_draw_date(raw_text)
 
-        if game_type == "TOTO":
+        if game_type == "TOTO": #here
             numbers = validate_toto_numbers(extracted_numbers)
 
-        elif game_type == "4D":
+        elif game_type == "4D": #here
             number = validate_4d_number(extracted_numbers)
             numbers = [number]
 
@@ -194,18 +144,10 @@ def upload_image_ticket(file: UploadFile = File(...)):
         "prize_results": prize_results
     }
 
-
+# -------------------------------------------------
+# History endpoint
+# -------------------------------------------------
 @app.get("/history")
 def get_ticket_history():
-    """
-    Get previously checked tickets from the SQLite database.
-
-    Returns:
-        dict: {
-            "count": int,
-            "tickets": list[dict]
-        }
-    """
     tickets = get_all_tickets()
     return {"count": len(tickets), "tickets": tickets}
-
