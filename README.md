@@ -136,6 +136,7 @@ pip install fastapi uvicorn python-multipart pytesseract pillow
 uvicorn backend.main:app --port 8001
 
 ### Frontend
+
 cd frontend
 python -m http.server 5500
 http://localhost:5500

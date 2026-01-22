@@ -1,3 +1,15 @@
+/*
+styles.css
+
+Styling for the Lottery Ticket Checker frontend.
+
+Design Goals:
+- High contrast for readability
+- Large font sizes for elderly accessibility
+- Simple card-based layout
+- Clean spacing and clear result display
+*/
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #ea76a4;
@@ -6,22 +18,26 @@ body {
   padding: 20px;
 }
 
+/* Main container width for better readability */
 .container {
   max-width: 520px;
   margin: auto;
 }
 
+/* Page title */
 h1 {
   font-size: 28px;
   text-align: center;
 }
 
+/* Subtitle / helper text */
 .subtitle {
   text-align: center;
   font-size: 18px;
   margin-bottom: 20px;
 }
 
+/* Card UI blocks */
 .card {
   background: #ffffff;
   padding: 20px;
@@ -35,12 +51,14 @@ h2 {
   margin-bottom: 10px;
 }
 
+/* Upload input styling */
 input[type="file"] {
   font-size: 18px;
   margin-bottom: 10px;
   width: 100%;
 }
 
+/* Button styling */
 button {
   font-size: 18px;
   padding: 12px;
@@ -56,29 +74,26 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* Helper hint under upload section */
 .hint {
   font-size: 14px;
   color: #555;
   margin-top: 8px;
 }
 
+/* Loading message style */
 .loading {
   text-align: center;
   font-size: 18px;
 }
 
+/* Each result row */
 .result-row {
   font-size: 18px;
   margin-bottom: 10px;
 }
 
-pre {
-  background: #f0f0f0;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 16px;
-}
-
+/* Result message formatting */
 .final-message {
   margin-top: 15px;
   font-size: 20px;
@@ -93,7 +108,7 @@ pre {
   color: #c62828;
 }
 
-/* Language switcher */
+/* Language selector dropdown */
 .language-switcher {
   position: fixed;
   top: 15px;
@@ -107,6 +122,7 @@ pre {
   border: 1px solid #ccc;
 }
 
+/* Winning numbers display box */
 .winning-box {
   background: #f5f7fa;
   padding: 14px;
@@ -118,3 +134,4 @@ pre {
 .winning-line {
   margin-bottom: 6px;
 }
+

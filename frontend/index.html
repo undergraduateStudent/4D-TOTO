@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <title>Lottery Ticket Checker</title>
 
+  <!--
+    index.html
+    ----------
+    Frontend UI page for the Lottery Ticket Checker project.
+
+    Purpose:
+    - Provides a simple and accessible interface to upload ticket images
+    - Displays extracted ticket numbers, winning numbers, and result messages
+    - Supports language switching (i18n) via script.js
+  -->
+
   <!-- Apply CSS -->
   <link rel="stylesheet" href="styles.css">
 
@@ -29,6 +40,7 @@
     <!-- Main container -->
     <div class="container">
 
+      <!-- Title and subtitle are updated via JS translations -->
       <h1 data-i18n="title">Lottery Ticket Checker</h1>
 
       <p class="subtitle" data-i18n="subtitle">
@@ -39,8 +51,10 @@
       <div class="card">
         <h2 data-i18n="step1">Step 1: Upload Ticket</h2>
 
+        <!-- File input for ticket image -->
         <input type="file" id="fileInput" accept="image/*">
 
+        <!-- Calls uploadTicket() from script.js -->
         <button class="primary-btn" onclick="uploadTicket()" data-i18n="check_ticket">
           Check Ticket
         </button>
@@ -50,7 +64,7 @@
         </p>
       </div>
 
-      <!-- Loading -->
+      <!-- Loading state while backend processes OCR -->
       <div class="card loading" id="loading" style="display:none;" data-i18n="loading">
         Checking your ticket, please wait...
       </div>
@@ -76,6 +90,7 @@
 
         <div id="finalMessage" class="final-message"></div>
 
+        <!-- Reset UI for checking another ticket -->
         <button class="secondary-btn" onclick="reset()" data-i18n="check_another">
           Check Another Ticket
         </button>

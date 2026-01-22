@@ -1,3 +1,17 @@
+"""
+ocr_service.py
+
+OCR and parsing utilities for extracting lottery ticket information
+from an uploaded image.
+
+This file contains helper functions to:
+- Extract raw OCR text from an image
+- Extract numeric content from OCR text
+- Classify game type (TOTO / 4D)
+- Validate TOTO numbers and 4D numbers
+- Extract the draw date from OCR text (best-effort)
+"""
+
 import pytesseract
 from PIL import Image
 import re
@@ -9,7 +23,13 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 def extract_text(image_path: str) -> str:
     """
-    Extract raw text from an image using OCR.
+    Extract raw text from an image using Tesseract OCR.
+
+    Args:
+        image_path (str): Local file path of the uploaded image.
+
+    Returns:
+        str: OCR-extracted raw text.
     """
     image = Image.open(image_path)
     text = pytesseract.image_to_string(image)
@@ -17,12 +37,18 @@ def extract_text(image_path: str) -> str:
 
 
 def extract_numbers_from_text(text: str) -> list[int]:
-
-     # Remove draw date line
-    #cleaned_text = re.sub(r"Draw Date:.*", "", text)
-
     """
-    Extract all numbers found in OCR text.
+    Extract all numbers found in the OCR text.
+
+    This function uses a simple regex to find digit sequences. The output
+    will include unrelated numbers such as years and dates, which should
+    be filtered in later validation.
+
+    Args:
+        text (str): OCR raw text.
+
+    Returns:
+        list[int]: All extracted numbers as integers.
     """
     numbers = re.findall(r"\d+", text)
     return [int(n) for n in numbers]
@@ -30,7 +56,26 @@ def extract_numbers_from_text(text: str) -> list[int]:
 
 def classify_game_type(raw_text: str, numbers: list[int]) -> str:
     """
-    Best-effort classification of game type based on OCR text and extracted numbers.
+    Determine game type based on OCR output.
+
+    Current logic:
+    - If OCR text contains "4D" or "4-D" -> classify as 4D
+    - If OCR text contains "TOTO" -> classify as TOTO
+    - Otherwise raise ValueError
+
+    Note:
+        There is fallback heuristic logic below, but it is currently unreachable
+        because the function raises earlier.
+
+    Args:
+        raw_text (str): OCR raw text.
+        numbers (list[int]): Extracted numbers from text.
+
+    Returns:
+        str: "4D" or "TOTO".
+
+    Raises:
+        ValueError: If game type cannot be identified.
     """
     text = raw_text.upper()
 
@@ -39,19 +84,7 @@ def classify_game_type(raw_text: str, numbers: list[int]) -> str:
 
     elif "TOTO" in text:
         return "TOTO"
-    
-    else:
-        raise ValueError("Unable to determine game type from OCR")
-        
 
-    # Heuristic fallback
-    if len(numbers) == 4 and all(0 <= n <= 9 for n in numbers):
-        return "4D"
-
-    elif len(numbers) >= 6:
-        return "TOTO"
-
-    #if len(numbers) <
     else:
         raise ValueError("Unable to determine game type from OCR")
 
@@ -59,34 +92,58 @@ def classify_game_type(raw_text: str, numbers: list[int]) -> str:
 def validate_toto_numbers(numbers: list[int]) -> list[int]:
     """
     Validate and clean OCR-extracted TOTO numbers.
-    """
 
+    Steps:
+    - Convert all items into integers
+    - Keep only numbers in range 1..49
+    - Remove duplicates while preserving order
+    - Ensure enough numbers exist
+
+    Args:
+        numbers (list[int]): OCR extracted numbers.
+
+    Returns:
+        list[int]: Cleaned unique TOTO numbers.
+
+    Raises:
+        ValueError: If invalid or insufficient numbers were found.
+    """
     try:
         numbers = [int(n) for n in numbers]
     except (ValueError, TypeError) as e:
         raise ValueError("Input list contains non-numeric values.") from e
-        
-    # Remove invalid ranges
-    valid = [n for n in numbers if 1 <= n <= 49]
 
-    # Remove duplicates while preserving order
+    valid = [n for n in numbers if 1 <= n <= 49]
     unique = list(dict.fromkeys(valid))
 
     if len(unique) <= 6:
-        raise ValueError(f"Invalid TOTO ticket: expected exactly 6 numbers, found {len(unique)}")
+        raise ValueError(
+            f"Invalid TOTO ticket: expected exactly 6 numbers, found {len(unique)}"
+        )
 
-    return unique #[:6]
+    return unique
+
 
 def validate_4d_number(extracted_numbers):
     """
-    Robust 4D validation:
-    - Accepts 4-digit grouped numbers (4109)
-    - Accepts spaced digits (4 1 0 9)
-    - Accepts mixed (410 9)
-    - Ignores draw date / year values
-    """
+    Validate and reconstruct a 4D ticket number.
 
-    # Remove obvious years
+    Supported patterns:
+    - One complete 4-digit number (e.g. 4109)
+    - Four spaced digits (e.g. 4 1 0 9)
+    - Split mixed digits (e.g. 410 + 9)
+
+    The function also removes obvious year-like numbers (1900..2100).
+
+    Args:
+        extracted_numbers (list[int]): Raw list of extracted numbers.
+
+    Returns:
+        str: A 4-digit string (zero-padded if needed).
+
+    Raises:
+        ValueError: If a valid 4D number cannot be reconstructed.
+    """
     cleaned = [
         n for n in extracted_numbers
         if not (1900 <= n <= 2100)
@@ -111,18 +168,25 @@ def validate_4d_number(extracted_numbers):
     raise ValueError("Invalid 4D ticket format")
 
 
-
-
-
 def extract_draw_date(raw_text: str) -> str:
     """
-    Best-effort extraction of draw date from OCR text.
-    Returns ISO date string or 'UNKNOWN'.
+    Extract draw date from OCR text using common date patterns.
+
+    Supported formats:
+    - YYYY-MM-DD
+    - DD/MM/YYYY
+    - DD MMM YYYY (e.g. 20 JAN 2026)
+
+    Args:
+        raw_text (str): OCR raw text.
+
+    Returns:
+        str: ISO date string (YYYY-MM-DD) or "UNKNOWN" if not found.
     """
     patterns = [
-        r"(\d{4}-\d{2}-\d{2})",       # 2026-01-20
-        r"(\d{2}/\d{2}/\d{4})",       # 20/01/2026
-        r"(\d{2}\s+[A-Z]{3}\s+\d{4})" # 20 JAN 2026
+        r"(\d{4}-\d{2}-\d{2})",
+        r"(\d{2}/\d{2}/\d{4})",
+        r"(\d{2}\s+[A-Z]{3}\s+\d{4})"
     ]
 
     for pattern in patterns:
